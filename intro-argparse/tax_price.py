@@ -9,7 +9,7 @@ def calculate_total_price(price, rate):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("price")
+    parser.add_argument("price", type=int)
     args = parser.parse_args()
 
     price = args.price
