@@ -1,4 +1,4 @@
-import sys
+import argparse
 
 
 def hi(name):
@@ -6,5 +6,5 @@ def hi(name):
 
 
 if __name__ == "__main__":
-    name = sys.argv[1]
-    hi(name)
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
