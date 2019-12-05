@@ -6,5 +6,5 @@ def hi(name):
 
 
 if __name__ == "__main__":
-    print(sys.argv)
-    hi("nikkie")
+    name = sys.argv[1]
+    hi(name)
