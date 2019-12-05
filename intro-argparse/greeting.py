@@ -2,4 +2,5 @@ def hi(name):
     print("Hi " + name + "!")
 
 
-hi("nikkie")
+if __name__ == "__main__":
+    hi("nikkie")
