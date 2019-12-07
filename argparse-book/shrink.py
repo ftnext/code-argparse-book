@@ -32,4 +32,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     src_path = args.src
-    shrink_image(src_path, SHRINKED_LENGTH)
+    if src_path.is_dir():
+        dest_dir = Path(src_path.name)
+        dest_dir.mkdir(exist_ok=True)
+        for img_path in src_path.iterdir():
+            save_path = dest_dir / img_path.name
+            shrink_image(img_path, SHRINKED_LENGTH, save_path)
+    else:
+        shrink_image(src_path, SHRINKED_LENGTH)
