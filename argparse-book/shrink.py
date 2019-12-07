@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from PIL import Image
@@ -7,7 +8,11 @@ SHRINKED_LENGTH = 300
 
 
 if __name__ == "__main__":
-    src_path = Path("/Users/.../Downloads/pyconjp.jpg")  # 絶対パスを指定してください
+    parser = argparse.ArgumentParser()
+    parser.add_argument("src", type=Path)
+    args = parser.parse_args()
+
+    src_path = args.src
     filename = src_path.name
     if filename.endswith((".png", ".jpg")):
         im = Image.open(src_path)
