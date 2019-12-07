@@ -7,7 +7,7 @@ from PIL import Image
 SHRINKED_LENGTH = 300
 
 
-def shrink_image(image_path, shrinked_length):
+def shrink_image(image_path, shrinked_length, save_path=None):
     filename = image_path.name
     if filename.endswith((".png", ".jpg")):
         im = Image.open(image_path)
@@ -20,7 +20,9 @@ def shrink_image(image_path, shrinked_length):
                 new_width = int((shrinked_length / height) * width)
                 new_height = shrinked_length
             resized_im = im.resize((new_width, new_height), Image.BICUBIC)
-            resized_im.save(filename)
+            if save_path is None:
+                save_path = filename
+            resized_im.save(save_path)
             print(f"画像を縮小しました: {filename}")
 
 
