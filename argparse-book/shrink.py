@@ -7,23 +7,27 @@ from PIL import Image
 SHRINKED_LENGTH = 300
 
 
+def shrink_image(image_path, shrinked_length):
+    filename = image_path.name
+    if filename.endswith((".png", ".jpg")):
+        im = Image.open(image_path)
+        width, height = im.size
+        if width > shrinked_length and height > shrinked_length:
+            if width > height:
+                new_width = shrinked_length
+                new_height = int((shrinked_length / width) * height)
+            else:
+                new_width = int((shrinked_length / height) * width)
+                new_height = shrinked_length
+            resized_im = im.resize((new_width, new_height), Image.BICUBIC)
+            resized_im.save(filename)
+            print(f"画像を縮小しました: {filename}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("src", type=Path)
     args = parser.parse_args()
 
     src_path = args.src
-    filename = src_path.name
-    if filename.endswith((".png", ".jpg")):
-        im = Image.open(src_path)
-        width, height = im.size
-        if width > SHRINKED_LENGTH and height > SHRINKED_LENGTH:
-            if width > height:
-                new_width = SHRINKED_LENGTH
-                new_height = int((SHRINKED_LENGTH / width) * height)
-            else:
-                new_width = int((SHRINKED_LENGTH / height) * width)
-                new_height = SHRINKED_LENGTH
-            resized_im = im.resize((new_width, new_height), Image.BICUBIC)
-            resized_im.save(filename)
-            print(f"画像を縮小しました: {filename}")
+    shrink_image(src_path, SHRINKED_LENGTH)
