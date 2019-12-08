@@ -14,7 +14,9 @@ def shrink_image(image_path, shrinked_length, save_path=None):
         if needs_shrink(im.size, shrinked_length):
             new_size = shrink_size(im.size, shrinked_length)
             resized_im = im.resize(new_size, Image.BICUBIC)
-            resized_im.save(filename)
+            if save_path is None:
+                save_path = filename
+            resized_im.save(save_path)
             print(f"画像を縮小しました: {filename}")
 
 

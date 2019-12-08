@@ -130,3 +130,36 @@ class ShrinkImageTestCase(TestCase):
         self.assertEqual(
             resized_im.save.call_args_list, [call(image_path.name)]
         )
+
+    @patch("shrink.shrink_size", spec=s.shrink_size)
+    @patch("shrink.needs_shrink", spec=s.needs_shrink, return_value=True)
+    @patch("shrink.Image.open", spec=Image.open)
+    @patch("shrink.is_target_image", spec=s.is_target_image, return_value=True)
+    def test_specify_save_path(
+        self, is_target_image, mock_open, needs_shrink, shrink_size
+    ):
+        image_path = MagicMock(spec=Path)
+        shrinked_length = MagicMock(spec=int)
+        save_path = MagicMock(spec=Path)
+        image_mock = mock_open.return_value
+        new_size = shrink_size.return_value
+        resized_im = image_mock.resize.return_value
+
+        s.shrink_image(image_path, shrinked_length, save_path)
+
+        self.assertEqual(
+            is_target_image.call_args_list, [call(image_path.name)]
+        )
+        self.assertEqual(mock_open.call_args_list, [call(image_path)])
+        self.assertEqual(
+            needs_shrink.call_args_list,
+            [call(image_mock.size, shrinked_length)],
+        )
+        self.assertEqual(
+            shrink_size.call_args_list,
+            [call(image_mock.size, shrinked_length)],
+        )
+        self.assertEqual(
+            image_mock.resize.call_args_list, [call(new_size, Image.BICUBIC)]
+        )
+        self.assertEqual(resized_im.save.call_args_list, [call(save_path)])
