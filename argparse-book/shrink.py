@@ -35,6 +35,17 @@ def needs_shrink(width_height_pair, limit):
     return width > limit and height > limit
 
 
+def shrink_size(width_height_pair, max_length):
+    width, height = width_height_pair
+    if width > height:
+        new_width = max_length
+        new_height = int((max_length / width) * height)
+    else:
+        new_width = int((max_length / height) * width)
+        new_height = max_length
+    return (new_width, new_height)
+
+
 def existing_path(path_str):
     path = Path(path_str)
     if not path.exists():

@@ -71,3 +71,23 @@ class NeedsShrinkTestCase(TestCase):
             with self.subTest(size=size):
                 actual = s.needs_shrink(size, self.limit)
                 self.assertFalse(actual)
+
+
+class ShrinkSizeTestCase(TestCase):
+    def setUp(self):
+        self.max_length = 400
+
+    def test_width_bigger_than_height(self):
+        size = (600, 300)
+        actual = s.shrink_size(size, self.max_length)
+        self.assertEqual(actual, (400, 200))
+
+    def test_height_bigger_than_width(self):
+        size = (500, 700)
+        actual = s.shrink_size(size, self.max_length)
+        self.assertEqual(actual, (285, 400))
+
+    def test_width_equal_height(self):
+        size = (700, 700)
+        actual = s.shrink_size(size, self.max_length)
+        self.assertEqual(actual, (400, 400))
