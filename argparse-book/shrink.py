@@ -26,6 +26,10 @@ def shrink_image(image_path, shrinked_length, save_path=None):
             print(f"画像を縮小しました: {filename}")
 
 
+def is_target_image(filename):
+    return filename.endswith((".png", ".jpg"))
+
+
 def existing_path(path_str):
     path = Path(path_str)
     if not path.exists():
