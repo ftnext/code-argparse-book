@@ -30,6 +30,11 @@ def is_target_image(filename):
     return filename.endswith((".png", ".jpg"))
 
 
+def needs_shrink(width_height_pair, limit):
+    width, height = width_height_pair
+    return width > limit and height > limit
+
+
 def existing_path(path_str):
     path = Path(path_str)
     if not path.exists():
