@@ -11,13 +11,11 @@ def shrink_image(image_path, shrinked_length, save_path=None):
     filename = image_path.name
     if is_target_image(filename):
         im = Image.open(image_path)
-        if needs_shrink(im.size, shrinked_length):
-            new_size = shrink_size(im.size, shrinked_length)
-            resized_im = im.resize(new_size, Image.BICUBIC)
-            if save_path is None:
-                save_path = filename
-            resized_im.save(save_path)
-            print(f"画像を縮小しました: {filename}")
+        grayed_im = im.convert('L')
+        if save_path is None:
+            save_path = filename
+        grayed_im.save(save_path)
+        print(f"画像を縮小しました: {filename}")
 
 
 def is_target_image(filename):
