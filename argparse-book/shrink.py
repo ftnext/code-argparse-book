@@ -19,14 +19,20 @@ def is_directory_path(a_path):
 def target_image_path_pairs(src_path, dest_path):
     path_pairs = []
     if src_path.is_dir():
-        dest_dir = dest_path / src_path.name
+        if dest_path.resolve() == Path.cwd():
+            dest_dir = dest_path / src_path.name
+        elif is_directory_path(dest_path):
+            dest_dir = dest_path
+        else:
+            message = f"ディレクトリの画像の指定先がファイルです。ディレクトリを指定してください"
+            raise ValueError(message)
         for img_path in src_path.iterdir():
             filename = img_path.name
             if is_target_image(filename):
                 save_path = dest_dir / filename
                 path_pair = {"src": img_path, "dest": save_path}
                 path_pairs.append(path_pair)
-        dest_dir.mkdir(exist_ok=True)
+        dest_dir.mkdir(parents=True, exist_ok=True)
     else:
         filename = src_path.name
         if is_target_image(filename):
