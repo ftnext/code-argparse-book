@@ -11,6 +11,11 @@ def is_target_image(filename):
     return filename.endswith((".png", ".jpg"))
 
 
+def is_directory_path(a_path):
+    """拡張子の.を含まない場合、ディレクトリのパスと判断する"""
+    return "." not in a_path.name
+
+
 def target_image_path_pairs(src_path, dest_path):
     path_pairs = []
     if src_path.is_dir():
@@ -25,7 +30,16 @@ def target_image_path_pairs(src_path, dest_path):
     else:
         filename = src_path.name
         if is_target_image(filename):
-            path_pair = {"src": src_path, "dest": dest_path / filename}
+            if dest_path.resolve() == Path.cwd():
+                path_pair = {"src": src_path, "dest": filename}
+            elif is_directory_path(dest_path):
+                dest_file_path = dest_path / filename
+                path_pair = {"src": src_path, "dest": dest_file_path}
+                dest_path.mkdir(parents=True, exist_ok=True)
+            else:
+                path_pair = {"src": src_path, "dest": dest_path}
+                dest_dir = dest_path.parent
+                dest_dir.mkdir(parents=True, exist_ok=True)
             path_pairs.append(path_pair)
     return path_pairs
 
