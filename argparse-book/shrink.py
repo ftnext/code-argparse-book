@@ -11,10 +11,13 @@ def is_target_image(filename):
     return filename.endswith((".png", ".jpg"))
 
 
-def target_image_path_pair(src_path):
+def target_image_path_pairs(src_path):
+    path_pairs = []
     filename = src_path.name
     if is_target_image(filename):
-        return {"src": src_path, "dest": filename}
+        path_pair = {"src": src_path, "dest": filename}
+        path_pairs.append(path_pair)
+    return path_pairs
 
 
 def needs_shrink(width_height_pair, limit):
@@ -48,6 +51,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     src_path = args.src
-    target_pair = target_image_path_pair(src_path)
-    if target_pair:
-        shrink_image(target_pair["src"], target_pair["dest"], SHRINKED_LENGTH)
+    target_pairs = target_image_path_pairs(src_path)
+    if target_pairs:
+        for target_pair in target_pairs:
+            shrink_image(
+                target_pair["src"], target_pair["dest"], SHRINKED_LENGTH
+            )
