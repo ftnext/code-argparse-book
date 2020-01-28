@@ -13,10 +13,20 @@ def is_target_image(filename):
 
 def target_image_path_pairs(src_path):
     path_pairs = []
-    filename = src_path.name
-    if is_target_image(filename):
-        path_pair = {"src": src_path, "dest": filename}
-        path_pairs.append(path_pair)
+    if src_path.is_dir():
+        dest_dir = Path(src_path.name)
+        for img_path in src_path.iterdir():
+            filename = img_path.name
+            if is_target_image(filename):
+                save_path = dest_dir / filename
+                path_pair = {"src": img_path, "dest": save_path}
+                path_pairs.append(path_pair)
+        dest_dir.mkdir(exist_ok=True)
+    else:
+        filename = src_path.name
+        if is_target_image(filename):
+            path_pair = {"src": src_path, "dest": filename}
+            path_pairs.append(path_pair)
     return path_pairs
 
 
