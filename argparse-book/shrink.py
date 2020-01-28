@@ -11,10 +11,10 @@ def is_target_image(filename):
     return filename.endswith((".png", ".jpg"))
 
 
-def target_image_path_pairs(src_path):
+def target_image_path_pairs(src_path, dest_path):
     path_pairs = []
     if src_path.is_dir():
-        dest_dir = Path(src_path.name)
+        dest_dir = dest_path / src_path.name
         for img_path in src_path.iterdir():
             filename = img_path.name
             if is_target_image(filename):
@@ -25,7 +25,7 @@ def target_image_path_pairs(src_path):
     else:
         filename = src_path.name
         if is_target_image(filename):
-            path_pair = {"src": src_path, "dest": filename}
+            path_pair = {"src": src_path, "dest": dest_path / filename}
             path_pairs.append(path_pair)
     return path_pairs
 
@@ -66,10 +66,12 @@ def existing_path(path_str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("src", type=existing_path)
+    parser.add_argument("--dest", type=Path, default=Path("."))
     args = parser.parse_args()
 
     src_path = args.src
-    target_pairs = target_image_path_pairs(src_path)
+    dest_path = args.dest
+    target_pairs = target_image_path_pairs(src_path, dest_path)
     if target_pairs:
         for target_pair in target_pairs:
             shrink_image(
