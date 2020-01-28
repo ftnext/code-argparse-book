@@ -55,9 +55,17 @@ def shrink_image(src_path, dest_path, shrinked_length):
         print(f"画像を縮小しました: {dest_path}")
 
 
+def existing_path(path_str):
+    path = Path(path_str)
+    if not path.exists():
+        message = f"{path_str} の指すファイル／ディレクトリが存在しません"
+        raise argparse.ArgumentTypeError(message)
+    return path
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("src", type=Path)
+    parser.add_argument("src", type=existing_path)
     args = parser.parse_args()
 
     src_path = args.src
