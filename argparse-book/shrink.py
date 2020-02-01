@@ -116,20 +116,38 @@ def existing_path(path_str):
     return path
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("src", type=existing_path)
-    parser.add_argument("--dest", type=Path, default=Path("."))
-    args = parser.parse_args()
+def is_valid_srcs_and_dests(src_paths, dest_paths):
+    if len(src_paths) != len(dest_paths):
+        message = "srcに指定された数とdestに指定された数が一致しません"
+        raise argparse.ArgumentTypeError(message)
+    for src_path, dest_path in zip(src_paths, dest_paths):
+        if not is_valid_src_and_dest(src_path, dest_path):
+            message = (
+                f"ディレクトリ{src_path}の画像の指定先がファイル{dest_path}です。ディレクトリを指定してください"
+            )
+            raise ValueError(message)
 
-    src_path = args.src
-    dest_path = args.dest
-    if not is_valid_src_and_dest(src_path, dest_path):
-        message = f"ディレクトリの画像の指定先がファイルです。ディレクトリを指定してください"
-        raise ValueError(message)
+
+def shrink_path_pair(src_path, dest_path):
     target_pairs = target_image_path_pairs(src_path, dest_path)
     if target_pairs:
         for target_pair in target_pairs:
             shrink_image(
                 target_pair["src"], target_pair["dest"], SHRINKED_LENGTH
             )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("src", type=existing_path, nargs="+")
+    parser.add_argument("--dest", type=Path, nargs="*")
+    args = parser.parse_args()
+
+    src_paths = args.src
+    dest_paths = args.dest
+    if dest_paths is None:
+        dest_paths = [Path(".")] * len(src_paths)
+
+    is_valid_srcs_and_dests(src_paths, dest_paths)
+    for src_path, dest_path in zip(src_paths, dest_paths):
+        shrink_path_pair(src_path, dest_path)
