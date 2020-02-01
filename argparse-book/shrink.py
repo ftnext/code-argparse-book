@@ -12,41 +12,69 @@ def is_target_image(filename):
 
 
 def is_directory_path(a_path):
-    """拡張子の.を含まない場合、ディレクトリのパスと判断する"""
+    """拡張子の.を含まない場合、ディレクトリのパスと判断する
+
+    Path(".")の場合はnameが''となるため、ディレクトリのパスと判断される
+    """
     return "." not in a_path.name
 
 
-def target_image_path_pairs(src_path, dest_path):
-    path_pairs = []
+def is_current_directory_path(a_path):
+    return a_path.resolve() == Path.cwd()
+
+
+def is_valid_src_and_dest(src_path, dest_path):
+    """srcとdestの組合せが適切かを確認
+
+    src_pathがディレクトリ、かつ、dest_pathがファイルの場合に限って、False
+    """
     if src_path.is_dir():
-        if dest_path.resolve() == Path.cwd():
-            dest_dir = dest_path / src_path.name
-        elif is_directory_path(dest_path):
-            dest_dir = dest_path
-        else:
-            message = f"ディレクトリの画像の指定先がファイルです。ディレクトリを指定してください"
-            raise ValueError(message)
-        for img_path in src_path.iterdir():
-            filename = img_path.name
-            if is_target_image(filename):
-                save_path = dest_dir / filename
-                path_pair = {"src": img_path, "dest": save_path}
-                path_pairs.append(path_pair)
-        dest_dir.mkdir(parents=True, exist_ok=True)
+        return is_directory_path(dest_path)
+    return True
+
+
+def listup_image_paths(a_path):
+    paths = []
+    if a_path.is_dir():
+        for item_path in a_path.iterdir():
+            if is_target_image(item_path.name):
+                paths.append(item_path)
+        return paths
+    if is_target_image(a_path.name):
+        paths.append(a_path)
+    return paths
+
+
+def dest_dir_path(dest_path, src_path):
+    # 前提：dest_pathとsrc_pathの組合せは適切（この関数で組合せについてエラーの判断はしなくていい）
+    if is_current_directory_path(dest_path) and src_path.is_dir():
+        dest_dir = dest_path / src_path.name
     else:
-        filename = src_path.name
-        if is_target_image(filename):
-            if dest_path.resolve() == Path.cwd():
-                path_pair = {"src": src_path, "dest": filename}
-            elif is_directory_path(dest_path):
-                dest_file_path = dest_path / filename
-                path_pair = {"src": src_path, "dest": dest_file_path}
-                dest_path.mkdir(parents=True, exist_ok=True)
-            else:
-                path_pair = {"src": src_path, "dest": dest_path}
-                dest_dir = dest_path.parent
-                dest_dir.mkdir(parents=True, exist_ok=True)
-            path_pairs.append(path_pair)
+        dest_dir = dest_path
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    return dest_dir
+
+
+def src_dest_path_pairs(src_paths, dest_dir):
+    # dest_dirをファイルのバスも受け付けるようにすると共通化できそう
+    path_pairs = []
+    for src_path in src_paths:
+        dest_path = dest_dir / src_path.name
+        path_pair = {"src": src_path, "dest": dest_path}
+        path_pairs.append(path_pair)
+    return path_pairs
+
+
+def target_image_path_pairs(src_path, dest_path):
+    if not is_directory_path(dest_path):
+        assert src_path.is_file()
+        # destのパスで指定されたディレクトリがないときは落とす（TODO：dest.parentディレクトリを作るか検討）
+        return [{"src": src_path, "dest": dest_path}]
+    # 以下では、dest_pathがカレントディレクトリ以外のディレクトリ
+    # srcがディレクトリまたはファイルだが、以下の関数でファイルへのパスのリストに揃う
+    src_image_paths = listup_image_paths(src_path)
+    dest_dir = dest_dir_path(dest_path, src_path)
+    path_pairs = src_dest_path_pairs(src_image_paths, dest_dir)
     return path_pairs
 
 
@@ -91,6 +119,9 @@ if __name__ == "__main__":
 
     src_path = args.src
     dest_path = args.dest
+    if not is_valid_src_and_dest(src_path, dest_path):
+        message = f"ディレクトリの画像の指定先がファイルです。ディレクトリを指定してください"
+        raise ValueError(message)
     target_pairs = target_image_path_pairs(src_path, dest_path)
     if target_pairs:
         for target_pair in target_pairs:
