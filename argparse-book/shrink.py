@@ -55,24 +55,29 @@ def dest_dir_path(dest_path, src_path):
     return dest_dir
 
 
-def src_dest_path_pairs(src_paths, dest_dir):
-    # dest_dirをファイルのバスも受け付けるようにすると共通化できそう
+def src_dest_path_pairs(src_paths, dest_dir_or_file):
     path_pairs = []
+    if not is_directory_path(dest_dir_or_file):
+        for src_path in src_paths:
+            path_pair = {"src": src_path, "dest": dest_dir_or_file}
+            path_pairs.append(path_pair)
+        return path_pairs
     for src_path in src_paths:
-        dest_path = dest_dir / src_path.name
+        dest_path = dest_dir_or_file / src_path.name
         path_pair = {"src": src_path, "dest": dest_path}
         path_pairs.append(path_pair)
     return path_pairs
 
 
 def target_image_path_pairs(src_path, dest_path):
+    # srcがディレクトリまたはファイルだが、以下の関数でファイルへのパスのリストに揃う
+    src_image_paths = listup_image_paths(src_path)
     if not is_directory_path(dest_path):
         assert src_path.is_file()
         # destのパスで指定されたディレクトリがないときは落とす（TODO：dest.parentディレクトリを作るか検討）
-        return [{"src": src_path, "dest": dest_path}]
-    # 以下では、dest_pathがカレントディレクトリ以外のディレクトリ
-    # srcがディレクトリまたはファイルだが、以下の関数でファイルへのパスのリストに揃う
-    src_image_paths = listup_image_paths(src_path)
+        path_pairs = src_dest_path_pairs(src_image_paths, dest_path)
+        return path_pairs
+    # 以下では、dest_pathがディレクトリ
     dest_dir = dest_dir_path(dest_path, src_path)
     path_pairs = src_dest_path_pairs(src_image_paths, dest_dir)
     return path_pairs
