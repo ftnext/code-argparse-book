@@ -27,6 +27,15 @@ def shrink_size(width_height_tuple, max_length):
     return (new_width, new_height)
 
 
+def shrink_image(src_path, save_path, shrinked_length):
+    im = Image.open(src_path)
+    if needs_shrink(im.size, shrinked_length):
+        new_size = shrink_size(im.size, shrinked_length)
+        resized_im = im.resize(new_size, Image.BICUBIC)
+        resized_im.save(save_path)
+        print(f"画像を縮小しました: {save_path}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("src", type=Path)

@@ -1,4 +1,8 @@
+from pathlib import Path
 from unittest import TestCase
+from unittest.mock import call, MagicMock, patch
+
+from PIL import Image
 
 import shrink as s
 
@@ -63,3 +67,49 @@ class ShrinkSizeTestCase(TestCase):
         size = (700, 700)
         actual = s.shrink_size(size, self.max_length)
         self.assertEqual(actual, (400, 400))
+
+
+class ShrinkImageTestCase(TestCase):
+    def setUp(self):
+        self.src_path = MagicMock(spec=Path)
+        self.save_path = MagicMock(spec=Path)
+        self.shrinked_length = MagicMock(spec=int)
+
+    @patch("shrink.shrink_size", spec=s.shrink_size)
+    @patch("shrink.needs_shrink", spec=s.needs_shrink, return_value=True)
+    @patch("shrink.Image.open", spec=Image.open)
+    def test_shrink(self, image_open, needs_shrink, shrink_size):
+        image = image_open.return_value
+        new_size = shrink_size.return_value
+        resized_im = image.resize.return_value
+
+        s.shrink_image(self.src_path, self.save_path, self.shrinked_length)
+
+        self.assertEqual(image_open.call_args_list, [call(self.src_path)])
+        self.assertEqual(
+            needs_shrink.call_args_list,
+            [call(image.size, self.shrinked_length)],
+        )
+        self.assertEqual(
+            shrink_size.call_args_list,
+            [call(image.size, self.shrinked_length)],
+        )
+        self.assertEqual(
+            image.resize.call_args_list, [call(new_size, Image.BICUBIC)]
+        )
+        self.assertEqual(
+            resized_im.save.call_args_list, [call(self.save_path)]
+        )
+
+    @patch("shrink.needs_shrink", spec=s.needs_shrink, return_value=False)
+    @patch("shrink.Image.open", spec=Image.open)
+    def test_not_shrink(self, image_open, needs_shrink):
+        image = image_open.return_value
+
+        s.shrink_image(self.src_path, self.save_path, self.shrinked_length)
+
+        self.assertEqual(image_open.call_args_list, [call(self.src_path)])
+        self.assertEqual(
+            needs_shrink.call_args_list,
+            [call(image.size, self.shrinked_length)],
+        )
