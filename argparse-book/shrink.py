@@ -15,6 +15,17 @@ def needs_shrink(width_height_tuple, limit):
     return width > limit and height > limit
 
 
+def shrink_size(width_height_tuple, max_length):
+    width, height = width_height_tuple
+    if width > height:
+        new_width = max_length
+        new_height = int((max_length / width) * height)
+    else:
+        new_width = int((max_length / height) * width)
+        new_height = max_length
+    return (new_width, new_height)
+
+
 if __name__ == "__main__":
     src_path = Path("/Users/.../Downloads/pyconjp.jpg")  # 絶対パスを指定してください
     filename = src_path.name
