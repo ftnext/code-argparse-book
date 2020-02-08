@@ -7,7 +7,8 @@ from PIL import Image
 SHRINKED_LENGTH = 300
 
 
-def is_target_image(filename):
+def is_target_image(path):
+    filename = path.name
     return filename.endswith((".png", ".jpg"))
 
 
@@ -22,9 +23,9 @@ def listup_paths(path):
 
 def src_dest_path_pairs(src_path, dest_path):
     path_pairs = []
-    filename = src_path.name
-    if is_target_image(filename):
-        path_pair = {"src": src_path, "dest": dest_path / filename}
+    if is_target_image(src_path):
+        dest = dest_path / src_path.name
+        path_pair = {"src": src_path, "dest": dest}
         path_pairs.append(path_pair)
     return path_pairs
 

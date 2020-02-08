@@ -12,14 +12,16 @@ class IsTargetImageTestCase(TestCase):
         target_file_names = ["kumiko.jpg", "kanade.png"]
         for filename in target_file_names:
             with self.subTest(filename=filename):
-                actual = s.is_target_image(filename)
+                path = Path.cwd()
+                actual = s.is_target_image(path / filename)
                 self.assertTrue(actual)
 
     def test_not_target(self):
         not_target_file_names = ["asuka.jpeg", "inochi.txt", "brassband"]
         for filename in not_target_file_names:
             with self.subTest(filename=filename):
-                actual = s.is_target_image(filename)
+                path = Path.cwd()
+                actual = s.is_target_image(path / filename)
                 self.assertFalse(actual)
 
 
@@ -51,22 +53,19 @@ class SrcDestPathPairsTestCase(TestCase):
 
     @patch("shrink.is_target_image", return_value=False)
     def test_empty(self, is_target_image):
-        filename = self.src_path.name
-
         actual = s.src_dest_path_pairs(self.src_path, self.dest_path)
 
-        self.assertEqual(is_target_image.call_args_list, [call(filename)])
+        self.assertEqual(is_target_image.call_args_list, [call(self.src_path)])
         self.assertEqual(actual, [])
 
     @patch("shrink.is_target_image", return_value=True)
     def test_one_pair(self, is_target_image):
-        filename = self.src_path.name
-        dest_path = self.dest_path / filename
+        dest_path = self.dest_path / self.src_path.name
         expected_pair = {"src": self.src_path, "dest": dest_path}
 
         actual = s.src_dest_path_pairs(self.src_path, self.dest_path)
 
-        self.assertEqual(is_target_image.call_args_list, [call(filename)])
+        self.assertEqual(is_target_image.call_args_list, [call(self.src_path)])
         self.assertEqual(actual, [expected_pair])
 
 
