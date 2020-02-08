@@ -51,11 +51,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     src_path = args.src
-    filename = src_path.name
-    if is_target_image(filename):
-        im = Image.open(src_path)
-        if needs_shrink(im.size, SHRINKED_LENGTH):
-            new_size = shrink_size(im.size, SHRINKED_LENGTH)
-            resized_im = im.resize(new_size, Image.BICUBIC)
-            resized_im.save(filename)
-            print(f"画像を縮小しました: {filename}")
+    dest_path = Path.cwd()
+    target_pairs = src_dest_path_pairs(src_path, dest_path)
+    for target_pair in target_pairs:
+        shrink_image(target_pair["src"], target_pair["dest"], SHRINKED_LENGTH)
