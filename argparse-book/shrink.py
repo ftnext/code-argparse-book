@@ -11,6 +11,15 @@ def is_target_image(filename):
     return filename.endswith((".png", ".jpg"))
 
 
+def listup_paths(path):
+    if path.is_file():
+        return [path]
+    paths = []
+    for item_path in path.iterdir():
+        paths.append(item_path)
+    return paths
+
+
 def src_dest_path_pairs(src_path, dest_path):
     path_pairs = []
     filename = src_path.name

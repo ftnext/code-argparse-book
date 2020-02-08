@@ -23,6 +23,27 @@ class IsTargetImageTestCase(TestCase):
                 self.assertFalse(actual)
 
 
+class ListUpPathsTestCase(TestCase):
+    def setUp(self):
+        self.src_path = MagicMock(spec=Path)
+
+    def test_directory(self):
+        self.src_path.is_file.return_value = False
+        path1, path2 = MagicMock(spec=Path), MagicMock(spec=Path)
+        self.src_path.iterdir.return_value = (path for path in [path1, path2])
+
+        actual = s.listup_paths(self.src_path)
+
+        self.assertEqual(actual, [path1, path2])
+
+    def test_file(self):
+        self.src_path.is_file.return_value = True
+
+        actual = s.listup_paths(self.src_path)
+
+        self.assertEqual(actual, [self.src_path])
+
+
 class SrcDestPathPairsTestCase(TestCase):
     def setUp(self):
         self.src_path = MagicMock(spec=Path)
