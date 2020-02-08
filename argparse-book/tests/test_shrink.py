@@ -23,6 +23,32 @@ class IsTargetImageTestCase(TestCase):
                 self.assertFalse(actual)
 
 
+class SrcDestPathPairsTestCase(TestCase):
+    def setUp(self):
+        self.src_path = MagicMock(spec=Path)
+        self.dest_path = MagicMock(spec=Path)
+
+    @patch("shrink.is_target_image", return_value=False)
+    def test_empty(self, is_target_image):
+        filename = self.src_path.name
+
+        actual = s.src_dest_path_pairs(self.src_path, self.dest_path)
+
+        self.assertEqual(is_target_image.call_args_list, [call(filename)])
+        self.assertEqual(actual, [])
+
+    @patch("shrink.is_target_image", return_value=True)
+    def test_one_pair(self, is_target_image):
+        filename = self.src_path.name
+        dest_path = self.dest_path / filename
+        expected_pair = {"src": self.src_path, "dest": dest_path}
+
+        actual = s.src_dest_path_pairs(self.src_path, self.dest_path)
+
+        self.assertEqual(is_target_image.call_args_list, [call(filename)])
+        self.assertEqual(actual, [expected_pair])
+
+
 class NeedsShrinkTestCase(TestCase):
     def setUp(self):
         self.limit = 400

@@ -11,6 +11,15 @@ def is_target_image(filename):
     return filename.endswith((".png", ".jpg"))
 
 
+def src_dest_path_pairs(src_path, dest_path):
+    path_pairs = []
+    filename = src_path.name
+    if is_target_image(filename):
+        path_pair = {"src": src_path, "dest": dest_path / filename}
+        path_pairs.append(path_pair)
+    return path_pairs
+
+
 def needs_shrink(width_height_tuple, limit):
     width, height = width_height_tuple
     return width > limit and height > limit
