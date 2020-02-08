@@ -10,6 +10,11 @@ def is_target_image(filename):
     return filename.endswith((".png", ".jpg"))
 
 
+def needs_shrink(width_height_tuple, limit):
+    width, height = width_height_tuple
+    return width > limit and height > limit
+
+
 if __name__ == "__main__":
     src_path = Path("/Users/.../Downloads/pyconjp.jpg")  # 絶対パスを指定してください
     filename = src_path.name
