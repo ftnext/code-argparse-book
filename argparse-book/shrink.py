@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from PIL import Image
@@ -27,7 +28,11 @@ def shrink_size(width_height_tuple, max_length):
 
 
 if __name__ == "__main__":
-    src_path = Path("/Users/.../Downloads/pyconjp.jpg")  # 絶対パスを指定してください
+    parser = argparse.ArgumentParser()
+    parser.add_argument("src", type=Path)
+    args = parser.parse_args()
+
+    src_path = args.src
     filename = src_path.name
     if is_target_image(filename):
         im = Image.open(src_path)
