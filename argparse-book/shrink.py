@@ -6,6 +6,10 @@ from PIL import Image
 SHRINKED_LENGTH = 300
 
 
+def is_target_image(filename):
+    return filename.endswith((".png", ".jpg"))
+
+
 if __name__ == "__main__":
     src_path = Path("/Users/.../Downloads/pyconjp.jpg")  # 絶対パスを指定してください
     filename = src_path.name
